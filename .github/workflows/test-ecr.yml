@@ -63,4 +63,3 @@ jobs:
           aws s3 cp ${IMAGE_TAG}.aws.json "s3://${S3_BUCKET}/${IMAGE_TAG}.aws.json"
           aws elasticbeanstalk create-application-version --application-name "${BEANSTALK_APP_NAME}" --version-label "${IMAGE_TAG}" --source-bundle "S3Bucket=${S3_BUCKET},S3Key=${IMAGE_TAG}.aws.json"
           aws elasticbeanstalk update-environment --environment-name "${BEANSTALK_APP_ENVIRONMENT}" --version-label "${IMAGE_TAG}"
-          
