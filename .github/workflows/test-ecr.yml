@@ -55,7 +55,7 @@ jobs:
         env:
           IMAGE_TAG: staging-${{ steps.tagging.outputs.new_version }}
           IMAGE_FULL: ${{ steps.login-ecr.outputs.registry }}/cql-api:staging-${{ steps.tagging.outputs.new_version }}
-          S3_BUCKET: eb-cql-api
+          S3_BUCKET: eb-cql-api-a
           BEANSTALK_APP_NAME: cql-api
           BEANSTALK_APP_ENVIRONMENT: cql-api-staging
         run: |
