@@ -5,7 +5,7 @@ on:
       - main
     tags:
       - '*.*.*-qa'
-      - '*.*.*-main'      
+      - '*.*.*-staging'      
 
 jobs:
   build:
@@ -40,9 +40,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: cql-test
-          IMAGE_TAG: main-${{ steps.tagging.outputs.new_version }}
+          IMAGE_TAG: staging-${{ steps.tagging.outputs.new_version }}
           IMAGE_TAG_LATEST: latest
         run: |
+          ./gradlew build
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_LATEST
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -50,11 +51,11 @@ jobs:
       
       - name: Deploy beanstalk (Staging)
         env:
-          IMAGE_TAG: main-${{ steps.tagging.outputs.new_version }}
-          IMAGE_FULL: ${{ steps.login-ecr.outputs.registry }}/cql-api:main-${{ steps.tagging.outputs.new_version }}
+          IMAGE_TAG: staging-${{ steps.tagging.outputs.new_version }}
+          IMAGE_FULL: ${{ steps.login-ecr.outputs.registry }}/cql-api:staging-${{ steps.tagging.outputs.new_version }}
           S3_BUCKET: eb-cql-api
           BEANSTALK_APP_NAME: cql-api
-          BEANSTALK_APP_ENVIRONMENT: cql-api-main
+          BEANSTALK_APP_ENVIRONMENT: cql-api-staging
         run: |
           echo "{\"AWSEBDockerrunVersion\":\"1\",\"Image\":{\"Name\":\"${IMAGE_FULL}\",\"Update\": \"true\"},\"Ports\":[{\"ContainerPort\":80}]}" > ${IMAGE_TAG}.aws.json
           aws s3 cp ${IMAGE_TAG}.aws.json "s3://${S3_BUCKET}/${IMAGE_TAG}.aws.json"
